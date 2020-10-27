@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHr LpR lfr">
 
-    <q-header elevated class="bg-dark text-white">
+    <q-header class="bg-dark text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="drawer = !drawer" />
         
@@ -13,7 +13,7 @@
       </q-toolbar>
       <div class="q-ml-lg q-mt-xl q-mb-md">
         <div class="text-h3">Todo</div>
-        <div class="text-subtitle1">Monday 12 November</div>
+        <div class="text-subtitle1">{{todayDate}}</div>
       </div>
       <!-- <q-img src="/src/assets/nature.jpg" spinner-color="white" style="height: 140px; max-width: 150px" /> -->
       
@@ -80,9 +80,11 @@
 </style>
 
 <script>
+import { date } from 'quasar'
 export default {
   data () {
     return {
+      todayDate: date.formatDate(Date.now(), 'dddd DD MMMM'),
       drawer: false,
     }
   },
