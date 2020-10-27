@@ -1,12 +1,13 @@
 <template>
   <q-page class="column bg-grey-2 q-pa-xs">
     <!-- <div class="q-pa-md"> -->
-      <div class="bg-transparent q-ma-sm">
+      <div class="q-ma-sm" :class="[this.$q.dark.isActive? 'bg-grey-4':'bg-transparent']">
         <q-input 
           v-model="newTask" 
           v-on:keyup.enter="addTask"
           color="dark" 
           outlined 
+          square
           placeholder="New Task" 
           dense>
           <template v-slot:append>
@@ -19,22 +20,24 @@
           </template>
         </q-input>
       </div>
-      <div>
+      <div class="bg-grey-2">
         <q-list
-          class="q-gutter-xs">
+          class="q-ma-sm"
+          separator
+          :class="[this.$q.dark.isActive? 'bg-dark':'bg-white']">
           <q-item 
             v-for="(task, index) in task_list" 
             :key="index"
-            class="bg-white"
+
             tag="label" 
             clickable 
             v-ripple
-            :class="[task.done?'bg-orange-1':'bg-white']">
+            :class="[task.done?'bg-orange-1':'bg-transparent']">
             <q-item-section avatar>
               <q-checkbox v-model="task.done" val="index" color="orange" />
             </q-item-section>
             <q-item-section>
-              <q-item-label :class="[task.done?'text-strike':'']">{{task}} {{index}}</q-item-label>
+              <q-item-label :class="[task.done?'text-strike text-dark':'']">{{task.title}}</q-item-label>
             </q-item-section>
             <q-item-section 
               v-if="task.done"
@@ -66,10 +69,6 @@ export default {
     return {
       newTask: '',
       task_list:[
-        {
-          title: 'title1',
-          done: false
-        },
       ],
     }
   },

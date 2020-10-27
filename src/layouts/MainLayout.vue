@@ -26,7 +26,7 @@
         side="left"
         bordered
         :width="200"
-        :breakpoint="400"
+        :breakpoint="600"
       >
         <q-scroll-area class="absolute-top" style="height: calc(100% - 192px); margin-top: 192px; border-right: 1px solid #ddd">
           <q-list padding>
@@ -65,7 +65,9 @@
 
 
     <q-page-container>
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </q-page-container>
 
   </q-layout>
