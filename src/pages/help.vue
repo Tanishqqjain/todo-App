@@ -9,7 +9,8 @@
 
         <q-separator dark inset />
         <q-card-section>
-          ToDo is a very user-friendly tool for organizing simple to-do lists on your iOS, Android, Web, Macbook, Windows etc. 
+          ToDo is a very user-friendly tool for organizing simple to-do lists on
+          your iOS, Android, Web, Macbook, Windows etc.
         </q-card-section>
       </q-card>
     </div>
@@ -22,7 +23,8 @@
 
         <q-separator inset />
         <q-card-section>
-          ToDo is a very user-friendly tool for organizing simple to-do lists on your iOS, Android, Web, Macbook, Windows etc. 
+          ToDo is a very user-friendly tool for organizing simple to-do lists on
+          your iOS, Android, Web, Macbook, Windows etc.
         </q-card-section>
       </q-card>
     </div>
@@ -30,7 +32,5 @@
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>
