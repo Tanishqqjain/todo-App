@@ -19,47 +19,26 @@
         </template>
       </q-input>
     </div>
-    <div class="bg-grey-2">
+    <div>
       <q-list
         class="q-ma-sm"
         separator
         :class="[this.$q.dark.isActive ? 'bg-dark' : 'bg-white']"
       >
-        <q-item
+        <task
           v-for="(task, index) in task_list"
           :key="index"
-          tag="label"
-          clickable
-          v-ripple
-          :class="[task.done ? 'bg-orange-1' : 'bg-transparent']"
-        >
-          <q-item-section avatar>
-            <q-checkbox v-model="task.done" val="index" color="orange" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label :class="[task.done ? 'text-strike text-dark' : '']">{{
-              task.title
-            }}</q-item-label>
-          </q-item-section>
-          <q-item-section v-if="task.done" side clickable v-ripple>
-            <q-btn
-              @click.stop="deleteTask(index)"
-              dense
-              unelevated
-              round
-              color="orange"
-              icon="delete"
-            />
-          </q-item-section>
-        </q-item>
+          :task="task"
+          :index="index"
+        ></task>
       </q-list>
     </div>
     <div
       v-if="!task_list.length"
       class="no-task absolute-center"
-      style="opacity: 0.5"
+      style="opacity:0.5; "
     >
-      <q-icon name="done" style="font-size: 3em" />
+      <q-icon name="done" style="font-size: 3em;" />
       <p>No task</p>
     </div>
     <!-- </div> -->
@@ -67,48 +46,23 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
-  data() {
-    return {
-      newTask: "",
-      task_list: []
-    };
+  computed: {
+    ...mapGetters({
+      task_list: "task_store/task_list",
+      newTask: "task_store/newTask"
+    })
+  },
+  components: {
+    task: require("components/Task/task").default
   },
   methods: {
     addTask() {
       if (this.newTask.trim()) {
-        this.task_list.unshift({
-          title: this.newTask.trim(),
-          done: false
-        });
+        this.task_list.unshift({ title: this.newTask.trim(), done: false });
         this.newTask = "";
       }
-    },
-    deleteTask(index) {
-      this.$q
-        .dialog({
-          title: "Confirm",
-          message: `Really want to delete?`,
-          cancel: true,
-          persistent: true
-        })
-        .onOk(() => {
-          this.task_list.splice(index, 1);
-          this.$q.notify({
-            type: "positive",
-            message: `Task deleted successfullly`
-          });
-        })
-        .onCancel(() => {
-          this.task_list[index].done = false;
-          this.$q.notify({
-            type: "negative",
-            message: `Task Deletion Cancelled.`
-          });
-        })
-        .onDismiss(() => {
-          // console.log('I am triggered on both OK and Cancel')
-        });
     }
   }
 };
