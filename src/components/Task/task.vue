@@ -6,7 +6,12 @@
     @click="updateTask({ id: index, updates: { done: !task.done } })"
   >
     <q-item-section avatar>
-      <q-checkbox v-model="task.done" val="index" color="orange" />
+      <q-checkbox
+        :value="task.done"
+        @input="updateTask({ id: index, updates: { done: !task.done } })"
+        val="index"
+        color="orange"
+      />
     </q-item-section>
     <q-item-section>
       <q-item-label :class="[task.done ? 'text-strike text-dark' : '']">{{
@@ -46,7 +51,7 @@ export default {
           this.deleteTask(index);
           this.$q.notify({
             type: "positive",
-            message: `Task deleted successfullly`
+            message: `Task Deleted Successfullly`
           });
         })
         .onCancel(() => {
