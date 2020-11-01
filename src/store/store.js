@@ -1,3 +1,4 @@
+import { firebaseAuth, firebaseDB } from 'boot/firebase'
 import Vue from 'vue'
 import { uid } from 'quasar'
 
@@ -14,6 +15,7 @@ const state = {
   },
 }
 
+console.log({firebaseAuth, firebaseDB})
 const getters = {
   task_list: (state) => state.task_list,
 }
