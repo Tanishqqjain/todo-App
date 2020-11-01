@@ -5,10 +5,14 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/todo.vue') },
-      { path: 'help/', component: () => import('pages/help.vue') }
+      { path: 'help/', component: () => import('pages/help.vue') },
+      {
+        path: '/auth/',
+        component: () => import('pages/auth.vue'),
+      },
     ]
   },
-
+  
   // Always leave this as last one,
   // but you can also remove it
   {

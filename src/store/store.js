@@ -1,4 +1,5 @@
-import { firebaseAuth, firebaseDB } from 'boot/firebase'
+// import { firebaseAuth, firebaseDB } from 'boot/firebase'
+import { firebase } from 'boot/firebase'
 import Vue from 'vue'
 import { uid } from 'quasar'
 
@@ -13,11 +14,12 @@ const state = {
     //   done: false
     // },
   },
+  user:{}
 }
 
-console.log({firebaseAuth, firebaseDB})
 const getters = {
   task_list: (state) => state.task_list,
+  user: (state) => state.user,
 }
 
 const mutations = {
@@ -29,6 +31,9 @@ const mutations = {
   },
   addTask(state, payload){
     Vue.set(state.task_list, payload.index, payload.newTask)
+  },
+  setUser(state, payload){
+    state.user = payload
   }
 }
 
@@ -43,7 +48,48 @@ const actions = {
     let index = uid()
     let payload = {index, newTask}
     commit('addTask', payload)
-
+  },
+  registerUser({}, payload){
+    
+  },
+  loginUser({}, payload){
+    
+  },
+  signInwithGoogle({ commit }){
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function(result) {
+      console.log("SignIn Successful.")
+    }).catch((e)=>{
+      console.log("SignIn Error: ", e)
+    })
+  },
+  userIsSignedInOrNot({ commit }){
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        let payload = {
+          name: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          loggedIn: true
+        }
+        commit('setUser', payload)
+      }else{
+        let payload = {
+          name: '',
+          email: '',
+          photoURL: '',
+          loggedIn: false
+        }
+        commit('setUser', payload)
+      }
+    });
+  },
+  logout({}){
+    firebase.auth().signOut().then(function() {
+      console.log("SignOut Successful.")
+    }).catch(function(error) {
+      console.log("Error occured during logout.", e)
+    });
   }
 }
 
