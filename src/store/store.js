@@ -24,16 +24,27 @@ const getters = {
 
 const mutations = {
   deleteTask(state, index){
+    // console.log(index)
     Vue.delete(state.task_list, index)
   },
   updateTask(state, payload){
+    // console.log(payload.id)
     state.task_list[payload.id].done = payload.updates.done
   },
   addTask(state, payload){
+    let databaseref =  firebase.firestore().collection('users').doc(state.user.email)
+    databaseref.update({
+        task_list: firebase.firestore.FieldValue.arrayUnion({index: payload.index, task: payload.newTask} )
+    }).then(result => {
+      console.log(result)
+    })
     Vue.set(state.task_list, payload.index, payload.newTask)
   },
   setUser(state, payload){
     state.user = payload
+  },
+  setUserData(state, payload){
+    state.task_list = payload
   }
 }
 
@@ -58,13 +69,24 @@ const actions = {
   signInwithGoogle({ commit }){
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider).then(function(result) {
-      console.log("SignIn Successful.")
+      var docRef = firebase.firestore().collection("users").doc(result.user.email);
+      docRef.get().then(function(doc) {
+          if (!doc.exists) {
+              docRef.set({task_list:[]})
+              console.log("SignUp Successful.")
+            } else {
+              console.log("SignIn Successful..")
+          }
+      }).catch(function(error) {
+          console.log("Error getting document:", error);
+      });
+
     }).catch((e)=>{
       console.log("SignIn Error: ", e)
     })
   },
-  userIsSignedInOrNot({ commit }){
-    firebase.auth().onAuthStateChanged(function(user) {
+  userIsSignedInOrNot({ commit, dispatch }){
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         let payload = {
           name: user.displayName,
@@ -73,6 +95,8 @@ const actions = {
           loggedIn: true
         }
         commit('setUser', payload)
+        dispatch('getUserData', payload)
+        // this.$router.push('/')
       }else{
         let payload = {
           name: '',
@@ -81,8 +105,25 @@ const actions = {
           loggedIn: false
         }
         commit('setUser', payload)
+        commit('setUserData', {})
+        // this.$router.push('/auth')
+        console.log()
       }
     });
+  },
+  getUserData({ commit }, payload){
+    firebase.firestore().collection("users").doc(payload.email)
+    .get()
+    .then(
+      function(doc) {
+        let data = {}
+        doc.data().task_list.forEach(task => {
+          data[task.index] = task.task
+        });
+        commit('setUserData', data)
+      }
+    );
+    // console.log(payload, "hii")
   },
   logout({}){
     firebase.auth().signOut().then(function() {

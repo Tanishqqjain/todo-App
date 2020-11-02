@@ -108,7 +108,7 @@
         @click="logout"
         fab
         icon="logout"
-        color="accent"
+        color="black"
       />
     </q-page-sticky>
   </q-layout>
