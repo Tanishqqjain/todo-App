@@ -1,4 +1,3 @@
-// import { firebaseAuth, firebaseDB } from 'boot/firebase'
 import { firebase } from 'boot/firebase'
 import Vue from 'vue'
 import { uid } from 'quasar'
@@ -24,27 +23,29 @@ const getters = {
 
 const mutations = {
   deleteTask(state, index){
-    // console.log(index)
+    let databaseref =  firebase.firestore().collection('users').doc(state.user.email)
+    databaseref.update({
+        [`task_list.${index}`]: firebase.firestore.FieldValue.delete()
+    })
     Vue.delete(state.task_list, index)
   },
   updateTask(state, payload){
-    // console.log(payload.id)
+    let databaseref =  firebase.firestore().collection('users').doc(state.user.email)
+    databaseref.update({
+        [`task_list.${payload.id}.done`]: payload.updates.done
+    })
     state.task_list[payload.id].done = payload.updates.done
   },
   addTask(state, payload){
     let databaseref =  firebase.firestore().collection('users').doc(state.user.email)
     databaseref.update({
-        task_list: firebase.firestore.FieldValue.arrayUnion({index: payload.index, task: payload.newTask} )
-    }).then(result => {
-      console.log(result)
+        [`task_list.${payload.index}`]: payload.newTask
     })
     Vue.set(state.task_list, payload.index, payload.newTask)
   },
-  setUser(state, payload){
-    state.user = payload
-  },
-  setUserData(state, payload){
-    state.task_list = payload
+  setUserDetailAndData(state, payload){
+    state.user = payload[0]
+    state.task_list = payload[1]
   }
 }
 
@@ -88,42 +89,35 @@ const actions = {
   userIsSignedInOrNot({ commit, dispatch }){
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        let payload = {
+        let userDetail = {
           name: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
           loggedIn: true
         }
-        commit('setUser', payload)
-        dispatch('getUserData', payload)
-        // this.$router.push('/')
+        firebase.firestore().collection("users").doc(userDetail.email)
+        .get()
+        .then(
+          function(doc) {
+            let userData = doc.data().task_list
+            let payload = [userDetail, userData]
+            commit('setUserDetailAndData', payload)
+          }
+        );
+        this.$router.push('/')
       }else{
-        let payload = {
+        let userDetail = {
           name: '',
           email: '',
           photoURL: '',
-          loggedIn: false
+          loggedIn: false,
         }
-        commit('setUser', payload)
-        commit('setUserData', {})
-        // this.$router.push('/auth')
+        let payload = [userDetail, {}]
+        commit('setUserDetailAndData', payload)
+        this.$router.push('/auth')
         console.log()
       }
     });
-  },
-  getUserData({ commit }, payload){
-    firebase.firestore().collection("users").doc(payload.email)
-    .get()
-    .then(
-      function(doc) {
-        let data = {}
-        doc.data().task_list.forEach(task => {
-          data[task.index] = task.task
-        });
-        commit('setUserData', data)
-      }
-    );
-    // console.log(payload, "hii")
   },
   logout({}){
     firebase.auth().signOut().then(function() {
