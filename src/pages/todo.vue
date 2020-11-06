@@ -18,25 +18,42 @@
         </template>
       </q-input>
     </div>
-    <div>
-      <q-list
-        class="q-ma-sm"
-        separator
-        :class="[this.$q.dark.isActive ? 'bg-dark' : 'bg-white']"
-      >
-        <task
-          v-for="(task, index) in task_list"
-          :key="index"
-          :task="task"
-          :index="index"
-        ></task>
-      </q-list>
+    <div class="column">
+      <scrollbar style="height:calc(100vh - 260px);">
+        <q-list
+          class="q-ma-sm"
+          separator
+          :class="[this.$q.dark.isActive ? 'bg-dark' : 'bg-white']"
+        >
+          <transition-group
+            name="custom-classes-transition"
+            duration-enter="500"
+            duration-leave="20"
+            enter-active-class="animated fadeInRight"
+            leave-active-class="animated fadeOutRight"
+            class="q-list q-list--separator"
+          >
+            <task
+              v-for="(task, index) in task_list"
+              :key="index + task"
+              :task="task"
+              :index="index"
+            ></task>
+          </transition-group>
+        </q-list>
+      </scrollbar>
     </div>
     <noTask v-if="!Object.keys(task_list).length" />
   </q-page>
 </template>
 
+<style lang="scss">
+.border {
+  border: 1px solid black;
+}
+</style>
 <script>
+import scrollbar from "components/scrollbar";
 import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
@@ -51,7 +68,8 @@ export default {
   },
   components: {
     task: require("components/Task/task").default,
-    noTask: require("components/Task/noTask").default
+    noTask: require("components/Task/noTask").default,
+    scrollbar
   },
   methods: {
     ...mapActions("task_store", ["addTask"]),
