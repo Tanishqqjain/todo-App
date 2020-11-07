@@ -1,6 +1,7 @@
 import { firebase } from 'boot/firebase'
 import Vue from 'vue'
 import { uid } from 'quasar'
+import { date } from 'quasar'
 
 const state = {
   task_list: {
@@ -57,7 +58,8 @@ const actions = {
     commit('updateTask', payload)
   },
   addTask({ commit }, newTask){
-    let index = uid()
+    let index = Date.now()
+    // let index = uid()
     let payload = {index, newTask}
     commit('addTask', payload)
   },
@@ -96,10 +98,16 @@ const actions = {
           loggedIn: true
         }
         firebase.firestore().collection("users").doc(userDetail.email)
-        .get()
-        .then(
+        .onSnapshot(
           function(doc) {
             let userData = doc.data().task_list
+            function sortObj(userData) {
+              return Object.keys(userData).sort().reduce(function (result, key) {
+                result[key] = userData[key];
+                return result;
+              }, {});
+            }
+            userData = sortObj(userData);
             let payload = [userDetail, userData]
             commit('setUserDetailAndData', payload)
           }
