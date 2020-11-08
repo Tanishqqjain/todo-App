@@ -34,4 +34,4 @@ yarn-error.log*
 
 #firebase authentication
 /src/boot/firebase.js
-/src/boot/route_authenticate.js
+/src/boot/guard.js
