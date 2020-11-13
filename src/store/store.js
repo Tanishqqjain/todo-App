@@ -168,6 +168,21 @@ const actions = {
     }).catch(function(error) {
       console.log("Error occured during logout.", e)
     });
+  },
+  sendPasswordResetEmail({}, email){
+    firebase.auth().sendPasswordResetEmail(email).then(function() {
+      Notify.create({
+        type: "positive",
+        message: "Password Reset link Sent Successfully"
+      });
+    }).catch(function(error) {
+      var errorCode = error.code.split('auth/')[1].split("-").join(" ");
+      errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Notify.create({
+        type: "negative",
+        message: errorCode
+      });
+    });
   }
 }
 

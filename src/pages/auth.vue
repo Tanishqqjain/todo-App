@@ -50,8 +50,42 @@
                 type="password"
                 label="Password"
               />
+              <div class="row justify-between">
+                <q-btn type="submit" color="black" label="Login" />
+                <q-btn
+                  @click="prompt = true"
+                  color="white"
+                  text-color="black"
+                  size="md"
+                  label="Forgot Password?"
+                />
+                <q-dialog v-model="prompt" persistent>
+                  <q-card style="min-width: 310px">
+                    <q-card-section>
+                      <div class="text-h6">Email Address</div>
+                    </q-card-section>
 
-              <q-btn type="submit" color="black" label="Login" />
+                    <q-card-section class="q-pt-none">
+                      <q-input clearable dense v-model="resetMail" autofocus />
+                    </q-card-section>
+
+                    <q-card-actions align="right" class="text-dark">
+                      <q-btn
+                        @click="resetMail = ''"
+                        flat
+                        label="Cancel"
+                        v-close-popup
+                      />
+                      <q-btn
+                        @click="resetPassword"
+                        flat
+                        label="Reset Password"
+                        v-close-popup
+                      />
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
+              </div>
             </q-form>
           </q-tab-panel>
 
@@ -111,20 +145,23 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      tab: "register",
+      tab: "login",
       user: {
         name: "",
         email: "",
         password1: "",
         password2: ""
-      }
+      },
+      prompt: false,
+      resetMail: ""
     };
   },
   methods: {
     ...mapActions("task_store", [
       "loginUser",
       "registerUser",
-      "signInwithGoogle"
+      "signInwithGoogle",
+      "sendPasswordResetEmail"
     ]),
     signInUserWithGoogle() {
       this.signInwithGoogle();
@@ -135,6 +172,10 @@ export default {
       } else if (this.tab === "register") {
         this.registerUser(this.user);
       }
+    },
+    resetPassword() {
+      this.sendPasswordResetEmail(this.resetMail);
+      this.resetMail = "";
     }
   }
 };
