@@ -1,12 +1,13 @@
 <template>
   <div class="q-pa-md column ">
     <q-btn
-      @click="signInwithGoogle"
+      class="electron-hide"
+      @click="signInUserWithGoogle"
       color="black"
       icon="mail"
       label="Sign in with Google"
     />
-    <div class="q-ma-sm text-center">
+    <div class="q-ma-sm text-center electron-hide">
       OR
     </div>
     <div class="q-gutter-y-md">
@@ -45,7 +46,7 @@
                 outlined
                 clearable
                 class="q-mb-sm"
-                v-model="user.password"
+                v-model="user.password1"
                 type="password"
                 label="Password"
               />
@@ -110,7 +111,7 @@ import { mapActions } from "vuex";
 export default {
   data() {
     return {
-      tab: "login",
+      tab: "register",
       user: {
         name: "",
         email: "",
@@ -125,13 +126,14 @@ export default {
       "registerUser",
       "signInwithGoogle"
     ]),
+    signInUserWithGoogle() {
+      this.signInwithGoogle();
+    },
     submitForm() {
       if (this.tab === "login") {
         this.loginUser(this.user);
       } else if (this.tab === "register") {
-        if (this.user.password1 === this.user.password2) {
-          this.registerUser(this.user);
-        }
+        this.registerUser(this.user);
       }
     }
   }

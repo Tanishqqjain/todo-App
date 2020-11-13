@@ -1,7 +1,6 @@
 import { firebase } from 'boot/firebase'
 import Vue from 'vue'
-import { uid } from 'quasar'
-import { date } from 'quasar'
+import { Notify } from 'quasar'
 
 const state = {
   task_list: {
@@ -64,10 +63,24 @@ const actions = {
     commit('addTask', payload)
   },
   registerUser({}, payload){
-    
+    firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password1).catch(function(error){
+      var errorCode = error.code.split('auth/')[1].split("-").join(" ");
+      errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Notify.create({
+        type: "negative",
+        message: errorCode
+      });
+    })
   },
   loginUser({}, payload){
-    
+    firebase.auth().signInWithEmailAndPassword(payload.email, payload.password1).catch(function(error) {
+      var errorCode = error.code.split('auth/')[1].split("-").join(" ");
+      errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Notify.create({
+        type: "negative",
+        message: errorCode
+      });
+    });
   },
   signInwithGoogle({ commit }){
     var provider = new firebase.auth.GoogleAuthProvider();
@@ -76,9 +89,9 @@ const actions = {
       docRef.get().then(function(doc) {
           if (!doc.exists) {
               docRef.set({task_list:[]})
-              console.log("SignUp Successful.")
+              // console.log("SignUp Successful.")
             } else {
-              console.log("SignIn Successful..")
+              // console.log("SignIn Successful..")
           }
       }).catch(function(error) {
           console.log("Error getting document:", error);
@@ -90,9 +103,9 @@ const actions = {
   },
   userIsSignedInOrNot({ commit, dispatch }){
     firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
+      if (user && user.emailVerified) {
         let userDetail = {
-          name: user.displayName,
+          name: user.displayName || user.email.split("@")[0],
           email: user.email,
           photoURL: user.photoURL,
           loggedIn: true
@@ -113,6 +126,29 @@ const actions = {
           }
         );
         this.$router.push('/')
+      }else if(user && !user.emailVerified){
+        Notify.create({
+          type: "negative",
+          message: `Please verify mail first`
+        });
+        // var user = firebase.auth().currentUser;
+        user.sendEmailVerification().then(function() {
+          firebase.auth().signOut().then(function() {
+            console.log("signoout successful", user.email)
+            var docRef = firebase.firestore().collection("users").doc(user.email);
+            docRef.get().then(function(doc) {
+            if (!doc.exists) {
+              docRef.set({task_list:[]})
+            }
+            }).catch(function(error) {
+              console.log("Error getting document:", error);
+            });
+          }).catch(function(error) {
+            console.log("SiginOut Error", error)
+          });
+        }).catch(function(error) {
+          console.log("error occured" , error)
+        });
       }else{
         let userDetail = {
           name: '',
@@ -123,7 +159,6 @@ const actions = {
         let payload = [userDetail, {}]
         commit('setUserDetailAndData', payload)
         this.$router.push('/auth')
-        console.log()
       }
     });
   },

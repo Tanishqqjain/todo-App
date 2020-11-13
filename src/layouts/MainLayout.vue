@@ -88,8 +88,8 @@
       >
         <div class="absolute-bottom bg-transparent">
           <q-avatar size="56px" class="q-mb-sm">
-            <img v-if="user.loggedIn" :src="user.photoURL" />
-            <img v-if="!user.loggedIn" src="../assets/user.png" />
+            <img v-if="user.photoURL" :src="user.photoURL" />
+            <img v-if="!user.photoURL" src="../assets/user.png" />
           </q-avatar>
           <div class="text-weight-bold">{{ user.name || "Username" }}</div>
           <div>{{ user.email || "xyz@gmail.com" }}</div>
@@ -105,7 +105,7 @@
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn
         v-if="user.loggedIn"
-        @click="logout"
+        @click="logout_user"
         fab
         icon="logout"
         color="black"
@@ -149,7 +149,11 @@ export default {
         this.$q.dark.set(true);
       }
     },
-    ...mapActions("task_store", ["logout"])
+    ...mapActions("task_store", ["logout"]),
+    logout_user() {
+      this.$q.dark.set(false);
+      this.logout();
+    }
   },
   created() {
     this.$q.dark.set(false);
