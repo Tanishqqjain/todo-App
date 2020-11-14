@@ -142,6 +142,7 @@
 
 <script>
 import { mapActions } from "vuex";
+import { QSpinnerGears } from "quasar";
 export default {
   data() {
     return {
@@ -164,9 +165,15 @@ export default {
       "sendPasswordResetEmail"
     ]),
     signInUserWithGoogle() {
+      this.$q.loading.show({
+        spinner: QSpinnerGears
+      });
       this.signInwithGoogle();
     },
     submitForm() {
+      this.$q.loading.show({
+        spinner: QSpinnerGears
+      });
       if (this.tab === "login") {
         this.loginUser(this.user);
       } else if (this.tab === "register") {
@@ -174,6 +181,9 @@ export default {
       }
     },
     resetPassword() {
+      this.$q.loading.show({
+        spinner: QSpinnerGears
+      });
       this.sendPasswordResetEmail(this.resetMail);
       this.resetMail = "";
     }

@@ -1,6 +1,7 @@
 import { firebase } from 'boot/firebase'
 import Vue from 'vue'
 import { Notify } from 'quasar'
+import { Loading, QSpinnerGears } from 'quasar'
 
 const state = {
   task_list: {
@@ -66,6 +67,7 @@ const actions = {
     firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password1).catch(function(error){
       var errorCode = error.code.split('auth/')[1].split("-").join(" ");
       errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Loading.hide({spinner: QSpinnerGears});
       Notify.create({
         type: "negative",
         message: errorCode
@@ -76,6 +78,7 @@ const actions = {
     firebase.auth().signInWithEmailAndPassword(payload.email, payload.password1).catch(function(error) {
       var errorCode = error.code.split('auth/')[1].split("-").join(" ");
       errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Loading.hide({spinner: QSpinnerGears});
       Notify.create({
         type: "negative",
         message: errorCode
@@ -97,8 +100,14 @@ const actions = {
           console.log("Error getting document:", error);
       });
 
-    }).catch((e)=>{
-      console.log("SignIn Error: ", e)
+    }).catch((error)=>{
+      var errorCode = error.code.split('auth/')[1].split("-").join(" ");
+      errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Loading.hide({spinner: QSpinnerGears});
+      Notify.create({
+        type: "negative",
+        message: errorCode
+      });
     })
   },
   userIsSignedInOrNot({ commit, dispatch }){
@@ -126,7 +135,11 @@ const actions = {
           }
         );
         this.$router.push('/')
+        Loading.hide({spinner: QSpinnerGears});
       }else if(user && !user.emailVerified){
+
+        Loading.hide({spinner: QSpinnerGears});
+        
         Notify.create({
           type: "negative",
           message: `Please verify mail first`
@@ -159,18 +172,20 @@ const actions = {
         let payload = [userDetail, {}]
         commit('setUserDetailAndData', payload)
         this.$router.push('/auth')
+        Loading.hide({spinner: QSpinnerGears});
       }
-    });
+    })
   },
   logout({}){
-    firebase.auth().signOut().then(function() {
-      console.log("SignOut Successful.")
-    }).catch(function(error) {
+    Loading.show({spinner: QSpinnerGears});
+    firebase.auth().signOut().catch(function(error) {
+      Loading.hide({spinner: QSpinnerGears});
       console.log("Error occured during logout.", e)
     });
   },
   sendPasswordResetEmail({}, email){
     firebase.auth().sendPasswordResetEmail(email).then(function() {
+      Loading.hide({spinner: QSpinnerGears});
       Notify.create({
         type: "positive",
         message: "Password Reset link Sent Successfully"
@@ -178,6 +193,7 @@ const actions = {
     }).catch(function(error) {
       var errorCode = error.code.split('auth/')[1].split("-").join(" ");
       errorCode = errorCode.charAt(0).toUpperCase() + errorCode.substring(1);
+      Loading.hide({spinner: QSpinnerGears});
       Notify.create({
         type: "negative",
         message: errorCode
